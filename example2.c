@@ -63,10 +63,10 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
         m_pCodecCtx->channels = 2;
     }
 
-    printf("Rate: %d Channels %d Channels: %d\n", 
-            (int) m_pCodecCtx->sample_rate,
-            (int) m_pCodecCtx->channel_layout,
-            (int) m_pCodecCtx->channels);
+    printf("Rate: %d Channels %d Channels: %d\n",
+           (int) m_pCodecCtx->sample_rate,
+           (int) m_pCodecCtx->channel_layout,
+           (int) m_pCodecCtx->channels);
 
     // They make big change in FFPEG 1.1 before that every format just passed
     // s16 back to application from FFMPEG 1.1 up MP3 pass s16p (Planar stereo
@@ -153,8 +153,8 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
     printf(" From Sample: %d Hz Sample format: %s",
            m_pFormatCtx->streams[m_iAudioStream]->codec->sample_rate,
            av_get_sample_fmt_name(inSampleFmt));
-    printf(" to 44100 Sample format: %s\n", 
-            av_get_sample_fmt_name(outSampleFmt));
+    printf(" to 44100 Sample format: %s\n",
+           av_get_sample_fmt_name(outSampleFmt));
 
     return 0;
 }

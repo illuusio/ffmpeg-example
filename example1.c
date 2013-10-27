@@ -92,5 +92,5 @@ int fe_decode_open(char *filename)
            (int64_t)round((double)(m_pFormatCtx->duration / AV_TIME_BASE) * (44100 * 4)));
     m_lPcmLength = (int64_t)round((double)(m_pFormatCtx->duration / AV_TIME_BASE) * (44100 * 4));
 
-   return 0;
+    return 0;
 }

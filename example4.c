@@ -64,8 +64,8 @@ long fe_read_seek(long filepos)
     avcodec_flush_buffers(m_pCodecCtx);
 
     if (ret < 0) {
-        printf("fe_read_seek: Seek ERROR ret(%d) filepos(%ld)\n", 
-                ret,
+        printf("fe_read_seek: Seek ERROR ret(%d) filepos(%ld)\n",
+               ret,
                filepos);
         return 0;
     }
@@ -84,7 +84,7 @@ long fe_read_seek(long filepos)
 
     printf("fe_read_seek: (RBP: %ld/%.4f) Req Byte: %ld \
            (Sec: %.4f PTS %ld) Real PTS %ld (Sec: %.4f Byte: %ld)\n",
-           filepos, 
+           filepos,
            (double)((double)filepos/(double)88200),
            minus,
            (double)((double)minus / (double)88200),
@@ -181,18 +181,18 @@ unsigned int fe_read_frame(char *buffer, int size)
                                (int64_t) round(l_fCurrentFFMPEGPosByte));
                         continue;
                     }  else if( l_iOffset >= m_pOutSize) {
-                          l_iOffset -= m_pOutSize;
-                          printf("fe_read_frame: Resample Offset left/readed: %ld/%ld (was: %ld) (PTS: %ld/%ld)\n",
+                        l_iOffset -= m_pOutSize;
+                        printf("fe_read_frame: Resample Offset left/readed: %ld/%ld (was: %ld) (PTS: %ld/%ld)\n",
                                l_iOffset,
                                (long int) m_pOutSize,
                                (long int) (l_iOffset + m_pOutSize),
                                (long int) l_SPacket.pts,
                                (long int) round(l_fCurrentFFMPEGPosByte));
-                          continue;
+                        continue;
                     }
 
                     printf("fe_read_frame: FFMPEG Sec %.4f (Byte: %ld) \
-                            Got bytes: (%d @ PTS %ld) (buffered: %ld/%ld)\n", 
+                            Got bytes: (%d @ PTS %ld) (buffered: %ld/%ld)\n",
                            l_fCurrentFFMPEGPosSec,
                            (long int) round(l_fCurrentFFMPEGPosByte),
                            l_iReadBytes,
@@ -202,7 +202,7 @@ unsigned int fe_read_frame(char *buffer, int size)
 
                     if( m_pOut != NULL ) {
 
-                      if( (m_pOutSize - l_iOffset) < l_iCopySize ) {
+                        if( (m_pOutSize - l_iOffset) < l_iCopySize ) {
                             printf("fe_read_frame: Resampled Copy Size: %ld Readed: %ld Offset: %ld Copied: %ld\n",
                                    (long int)l_iCopySize,
                                    (long int)m_pOutSize,
