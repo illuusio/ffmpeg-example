@@ -58,8 +58,12 @@ int main(int argc, char * argv[])
     l_iStartCur = l_iStart + (l_iRead / 2);
     l_iReadCur = l_iRead / l_iSeekStep;
 
-    // Use old slow MP3 Xing TOC
-    av_opt_set_int(m_pCodecCtx, "usetoc", 1, 0);
+    // Enable this to use old slow MP3 Xing TOC
+#ifndef CODEC_ID_MP3
+    //if( m_pCodecCtx->codec_id == AV_CODEC_ID_MP3) {
+    //    av_opt_set_int(m_pCodecCtx->priv_data, "usetoc", 1, 0);
+    //}
+#endif
 
     // This example stars from middle and then seeks forward and
     // backward
