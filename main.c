@@ -25,13 +25,20 @@
 
 int main(int argc, char * argv[])
 {
-    int i = 0;
+    int64_t i = 0;
+    int64_t j = 0;
 //fe_read_seek(0);
     char l_strBuffer[65355];
     FILE *l_pOutFile = NULL;
     int l_iReadSize = 0;
-    int l_iRead = 2000;
-    int l_iStart = 500;
+    int64_t l_iRead = 5000;
+    int64_t l_iStart = 0;
+    int64_t l_iStartCur = 0;
+    int64_t l_iReadCur = 0;
+    int64_t l_iStartUp = 0;
+    int64_t l_iStartDown = 0;
+    int64_t l_iSeekDirection = 0;
+    int64_t l_iSeekStep = 50;
 
     av_register_all();
     avcodec_register_all();
@@ -41,16 +48,58 @@ int main(int argc, char * argv[])
 
     l_pOutFile = fopen("out-for.pcm", "w+");
 
-    for( i = l_iStart; i <= l_iRead; i ++) {
-        memset(l_strBuffer, 0x00, 65355);
-        printf("Loop: %d\n", i);
-        fe_read_seek(2304 * i);
-        l_iReadSize = fe_read_frame(l_strBuffer, 2304);
-        fwrite(l_strBuffer, l_iReadSize, 1, l_pOutFile);
-        memset(l_strBuffer, 0x77, 65355);
-        // fwrite(l_strBuffer, 100, 1, l_pOutFile);
+    memset(l_strBuffer, 0x99, 65355);
+
+    for( i = l_iStart; i < l_iRead; i ++) {
+        fwrite(l_strBuffer, 4608, 1, l_pOutFile);
     }
 
+    // We start reading at the half of file our wanted area..
+    l_iStartCur = l_iStart + (l_iRead / 2);
+    l_iReadCur = l_iRead / l_iSeekStep;
+
+    // Use old slow MP3 Xing TOC
+    av_opt_set_int(m_pCodecCtx, "usetoc", 1, 0);
+
+    // This example stars from middle and then seeks forward and
+    // backward
+    for( j = 0; j < 50; j++ ) {
+        printf("Start: %ld Read: %ld\n", l_iStartCur, l_iReadCur);
+
+        for( i = 0; i <= l_iReadCur; i ++) {
+            memset(l_strBuffer, 0x00, 65355);
+            printf("Loop: %ld/%ld\n", j,i);
+            fe_read_seek(2304 * (i + l_iStartCur));
+            l_iReadSize = fe_read_frame(l_strBuffer, 2304);
+            fseek( l_pOutFile, (2304 * 2) * (i + l_iStartCur), SEEK_SET);
+            fwrite(l_strBuffer, l_iReadSize, 1, l_pOutFile);
+            // If you like to see what we just read eanble this..
+            //memset(l_strBuffer, 0x77, 65355);
+            // fwrite(l_strBuffer, 100, 1, l_pOutFile);
+        }
+        if( l_iStartDown == 0 || l_iStartDown > l_iStartCur ) {
+            l_iStartDown = l_iStartCur;
+        }
+
+        if( l_iStartUp == 0 || l_iStartUp < l_iStartCur ) {
+            l_iStartUp = l_iStartCur;
+        }
+
+        if( l_iSeekDirection == 0 ) {
+            l_iSeekDirection = 1;
+            l_iStartCur = l_iStartDown - (l_iStartDown / 2);
+            l_iReadCur = l_iStartDown - l_iStartCur;
+        } else {
+            l_iSeekDirection = 0;
+            l_iReadCur = l_iRead / l_iSeekStep;
+            l_iStartCur = l_iStartUp + l_iReadCur;
+        }
+
+        if( l_iStartCur < l_iStart) {
+            l_iStartCur = l_iStart;
+            l_iReadCur = l_iStartDown - l_iStartCur;
+        }
+    }
     fclose(l_pOutFile);
 
     if (m_pCodecCtx != NULL) {
@@ -59,35 +108,33 @@ int main(int argc, char * argv[])
         m_pCodecCtx = NULL;
         m_pFormatCtx = NULL;
     }
-    fe_decode_open(argv[1]);
-    fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
+    return 0;
 
-    l_pOutFile = fopen("out-rev.pcm", "w+");
-
-    for( i = l_iStart; i < l_iRead; i ++) {
-        memset(l_strBuffer, 0x33, 65355);
-        fwrite(l_strBuffer, 4608, 1, l_pOutFile);
-    }
-
-
-    for( i = l_iRead; i >= l_iStart; i --) {
-        memset(l_strBuffer, 0x00, 65355);
-        printf("Loop: %d\n", i);
-        fe_read_seek(2304 * i);
-        // fe_read_seek((rand() % 2304) * i * 10);
-        // fe_read_seek(2304 * i * 10);
-        l_iReadSize = fe_read_frame(l_strBuffer, 2304);
-        fseek( l_pOutFile, (2304 * 2) * (i - l_iStart), SEEK_SET);
-        fwrite(l_strBuffer, l_iReadSize, 1, l_pOutFile);
-        memset(l_strBuffer, 0x77, 65355);
-        // fwrite(l_strBuffer, 100, 1, l_pOutFile);
-    }
-
-    fclose(l_pOutFile);
-
-//for( i = 0; i < 2; i ++) {
-//    fe_read_seek(2304 * (i * 10));
-//}
+    // This is example that reads from end to start..
+    //
+    //fe_decode_open(argv[1]);
+    //fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
+    //
+    //l_pOutFile = fopen("out-rev.pcm", "w+");
+    //
+    //for( i = l_iStart; i < l_iRead; i ++) {
+    //    memset(l_strBuffer, 0x33, 65355);
+    //    fwrite(l_strBuffer, 4608, 1, l_pOutFile);
+    //}
+    //
+    //
+    //for( i = l_iRead; i >= l_iStart; i --) {
+    //    memset(l_strBuffer, 0x00, 65355);
+    //    printf("Loop: %ld\n", i);
+    //    fe_read_seek(2304 * i);
+    //    l_iReadSize = fe_read_frame(l_strBuffer, 2304);
+    //    fseek( l_pOutFile, (2304 * 2) * (i - l_iStart), SEEK_SET);
+    //    fwrite(l_strBuffer, l_iReadSize, 1, l_pOutFile);
+    //    memset(l_strBuffer, 0x77, 65355);
+    //    // fwrite(l_strBuffer, 100, 1, l_pOutFile);
+    //}
+    //
+    //fclose(l_pOutFile);
 
     if (m_pCodecCtx != NULL) {
         avcodec_close(m_pCodecCtx);

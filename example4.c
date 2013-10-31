@@ -167,7 +167,10 @@ unsigned int fe_read_frame(char *buffer, int size)
 
                     if( m_iCurrentMixxTs > l_fCurrentFFMPEGPosByte && l_iOffset == 0) {
                         l_iOffset = m_iCurrentMixxTs - (int64_t) round(l_fCurrentFFMPEGPosByte);
-                        printf("fe_read_frame: Offset %ld = %ld - %ld\n", l_iOffset, m_iCurrentMixxTs, (int64_t) round(l_fCurrentFFMPEGPosByte));
+                        printf("fe_read_frame: Offset %ld = %ld - %ld\n",
+                               l_iOffset,
+                               m_iCurrentMixxTs,
+                               (int64_t) round(l_fCurrentFFMPEGPosByte));
                         l_iOffset *= 2;
                     }
 

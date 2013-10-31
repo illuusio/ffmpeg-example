@@ -87,7 +87,7 @@ int fe_decode_open(char *filename)
         return -1;
     }
 
-    printf("fe_decode_open: Length is: %f (Bytes: %ld)\n",
+    printf("fe_decode_open: PCM Length is: %f (Bytes: %ld)\n",
            (double)(m_pFormatCtx->duration / AV_TIME_BASE),
            (int64_t)round((double)(m_pFormatCtx->duration / AV_TIME_BASE) * (44100 * 4)));
     m_lPcmLength = (int64_t)round((double)(m_pFormatCtx->duration / AV_TIME_BASE) * (44100 * 4));
