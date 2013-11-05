@@ -30,20 +30,37 @@ int64_t m_lPcmLength = 0;
 int fe_decode_open(char *filename)
 {
     int i = -1;
+    AVDictionary *l_iFormatOpts = NULL; 
 
     printf("fe_decode_open: Decode audio file %s\n",
            filename);
 
     m_pFormatCtx = avformat_alloc_context();
 
+// Enable this to use old slow MP3 Xing TOC
+#ifndef CODEC_ID_MP3
+    if ( LIBAVFORMAT_VERSION_INT > 3540580 ){
+        printf("fe_decode_open: Set usetoc to have old way of XING TOC reading (libavformat version: '%d')\n",LIBAVFORMAT_VERSION_INT);
+        av_dict_set(&l_iFormatOpts, "usetoc", "0", 0);
+    }
+#endif
+
     // Open file and make m_pFormatCtx
-    if (avformat_open_input(&m_pFormatCtx,filename, NULL, NULL)!=0) {
+    if (avformat_open_input(&m_pFormatCtx,filename, NULL, &l_iFormatOpts)!=0) {
         printf("fe_decode_open: cannot open: %s\n",
                filename);
         return -1;
     }
 
+#ifndef CODEC_ID_MP3
+    if ( LIBAVFORMAT_VERSION_INT > 3540580 && l_iFormatOpts != NULL ){
+       av_dict_free(&l_iFormatOpts);
+    }
+#endif
+
     m_pFormatCtx->max_analyze_duration = 999999999;
+
+
 
     // Retrieve stream information
     if (avformat_find_stream_info(m_pFormatCtx, NULL)<0) {
@@ -86,6 +103,8 @@ int fe_decode_open(char *filename)
                filename);
         return -1;
     }
+
+
 
     printf("fe_decode_open: PCM Length is: %f (Bytes: %ld)\n",
            (double)(m_pFormatCtx->duration / AV_TIME_BASE),

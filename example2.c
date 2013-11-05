@@ -178,10 +178,10 @@ unsigned int fe_resample_do(AVFrame *inframe)
 
 // Left here for reason!
 // Sometime in time we will need this!
-#else
-        int64_t l_lInReadBytes = av_samples_get_buffer_size(NULL, m_pCodecCtx->channels,
-                                 inframe->nb_samples,
-                                 m_pCodecCtx->sample_fmt, 1);
+//#else
+//        int64_t l_lInReadBytes = av_samples_get_buffer_size(NULL, m_pCodecCtx->channels,
+//                                 inframe->nb_samples,
+//                                 m_pCodecCtx->sample_fmt, 1);
 #endif
 
 #ifndef __FFMPEGOLDAPI__

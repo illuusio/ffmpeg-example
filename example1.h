@@ -23,6 +23,7 @@
 
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/opt.h>
 
 extern AVFormatContext *m_pFormatCtx;
 extern AVInputFormat *m_pIformat;

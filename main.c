@@ -58,16 +58,11 @@ int main(int argc, char * argv[])
     l_iStartCur = l_iStart + (l_iRead / 2);
     l_iReadCur = l_iRead / l_iSeekStep;
 
-    // Enable this to use old slow MP3 Xing TOC
-#ifndef CODEC_ID_MP3
-    //if( m_pCodecCtx->codec_id == AV_CODEC_ID_MP3) {
-    //    av_opt_set_int(m_pCodecCtx->priv_data, "usetoc", 1, 0);
-    //}
-#endif
+    //av_opt_show2(&m_pFormatCtx->iformat->priv_class, NULL, AV_OPT_FLAG_DECODING_PARAM, 0);
 
     // This example stars from middle and then seeks forward and
-    // backward
-    for( j = 0; j < 50; j++ ) {
+    // backward 
+    for( j = 0; j < 50; j++ ){
         printf("Start: %ld Read: %ld\n", l_iStartCur, l_iReadCur);
 
         for( i = 0; i <= l_iReadCur; i ++) {
@@ -81,27 +76,27 @@ int main(int argc, char * argv[])
             //memset(l_strBuffer, 0x77, 65355);
             // fwrite(l_strBuffer, 100, 1, l_pOutFile);
         }
-        if( l_iStartDown == 0 || l_iStartDown > l_iStartCur ) {
-            l_iStartDown = l_iStartCur;
+        if( l_iStartDown == 0 || l_iStartDown > l_iStartCur ){
+            l_iStartDown = l_iStartCur; 
         }
 
-        if( l_iStartUp == 0 || l_iStartUp < l_iStartCur ) {
-            l_iStartUp = l_iStartCur;
+        if( l_iStartUp == 0 || l_iStartUp < l_iStartCur ){
+            l_iStartUp = l_iStartCur; 
         }
 
-        if( l_iSeekDirection == 0 ) {
-            l_iSeekDirection = 1;
-            l_iStartCur = l_iStartDown - (l_iStartDown / 2);
-            l_iReadCur = l_iStartDown - l_iStartCur;
+        if( l_iSeekDirection == 0 ){
+           l_iSeekDirection = 1; 
+           l_iStartCur = l_iStartDown - (l_iStartDown / 2);
+           l_iReadCur = l_iStartDown - l_iStartCur;
         } else {
-            l_iSeekDirection = 0;
-            l_iReadCur = l_iRead / l_iSeekStep;
-            l_iStartCur = l_iStartUp + l_iReadCur;
+           l_iSeekDirection = 0;
+           l_iReadCur = l_iRead / l_iSeekStep;
+           l_iStartCur = l_iStartUp + l_iReadCur;
         }
 
-        if( l_iStartCur < l_iStart) {
-            l_iStartCur = l_iStart;
-            l_iReadCur = l_iStartDown - l_iStartCur;
+        if( l_iStartCur < l_iStart){
+           l_iStartCur = l_iStart;
+           l_iReadCur = l_iStartDown - l_iStartCur;
         }
     }
     fclose(l_pOutFile);
@@ -115,7 +110,7 @@ int main(int argc, char * argv[])
     return 0;
 
     // This is example that reads from end to start..
-    //
+    // 
     //fe_decode_open(argv[1]);
     //fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
     //
