@@ -31,8 +31,8 @@ int main(int argc, char * argv[])
     char l_strBuffer[65355];
     FILE *l_pOutFile = NULL;
     int l_iReadSize = 0;
-    int64_t l_iRead = 5000;
-    int64_t l_iStart = 0;
+    int64_t l_iRead = 200;
+    int64_t l_iStart = 1000;
     int64_t l_iStartCur = 0;
     int64_t l_iReadCur = 0;
     int64_t l_iStartUp = 0;
@@ -40,10 +40,39 @@ int main(int argc, char * argv[])
     int64_t l_iSeekDirection = 0;
     int64_t l_iSeekStep = 50;
 
+
+// FFMPEG uses SOMETHING_MICRO > 100 and Avconv under
+#if LIBAVCODEC_VERSION_MICRO >= 100
+    printf("Using Library: FFmpeg\n");
+#else
+    printf("Using Library: Avconv\n");
+#endif
+
+    printf("libavcodec version %d.%d.%d (%d)\n",LIBAVCODEC_VERSION_MAJOR,
+           LIBAVCODEC_VERSION_MINOR,
+           LIBAVCODEC_VERSION_MICRO,
+           LIBAVCODEC_VERSION_INT);
+    printf("libavformat version %d.%d.%d (%d)\n",LIBAVFORMAT_VERSION_MAJOR,
+           LIBAVFORMAT_VERSION_MINOR,
+           LIBAVFORMAT_VERSION_MICRO,
+           LIBAVFORMAT_VERSION_INT);
+
+
+    if( argc < 2 ) {
+        printf("Usage: ffmpeg-example-bin audio.mp3/wav/flac/ogg/opus/m4v/aac\n");
+        printf("\nOpen with audacity file: 'out-f.pcm' (import raw data)\n");
+        printf("Stereo 16 Bit / Little Endian / 2 channels\n");
+        return 0;
+    }
+
+
+
+
     av_register_all();
     avcodec_register_all();
     fe_decode_open(argv[1]);
     fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
+
 
 
     l_pOutFile = fopen("out-for.pcm", "w+");
@@ -61,8 +90,8 @@ int main(int argc, char * argv[])
     //av_opt_show2(&m_pFormatCtx->iformat->priv_class, NULL, AV_OPT_FLAG_DECODING_PARAM, 0);
 
     // This example stars from middle and then seeks forward and
-    // backward 
-    for( j = 0; j < 50; j++ ){
+    // backward
+    for( j = 0; j < 50; j++ ) {
         printf("Start: %ld Read: %ld\n", l_iStartCur, l_iReadCur);
 
         for( i = 0; i <= l_iReadCur; i ++) {
@@ -76,27 +105,27 @@ int main(int argc, char * argv[])
             //memset(l_strBuffer, 0x77, 65355);
             // fwrite(l_strBuffer, 100, 1, l_pOutFile);
         }
-        if( l_iStartDown == 0 || l_iStartDown > l_iStartCur ){
-            l_iStartDown = l_iStartCur; 
+        if( l_iStartDown == 0 || l_iStartDown > l_iStartCur ) {
+            l_iStartDown = l_iStartCur;
         }
 
-        if( l_iStartUp == 0 || l_iStartUp < l_iStartCur ){
-            l_iStartUp = l_iStartCur; 
+        if( l_iStartUp == 0 || l_iStartUp < l_iStartCur ) {
+            l_iStartUp = l_iStartCur;
         }
 
-        if( l_iSeekDirection == 0 ){
-           l_iSeekDirection = 1; 
-           l_iStartCur = l_iStartDown - (l_iStartDown / 2);
-           l_iReadCur = l_iStartDown - l_iStartCur;
+        if( l_iSeekDirection == 0 ) {
+            l_iSeekDirection = 1;
+            l_iStartCur = l_iStartDown - (l_iStartDown / 2);
+            l_iReadCur = l_iStartDown - l_iStartCur;
         } else {
-           l_iSeekDirection = 0;
-           l_iReadCur = l_iRead / l_iSeekStep;
-           l_iStartCur = l_iStartUp + l_iReadCur;
+            l_iSeekDirection = 0;
+            l_iReadCur = l_iRead / l_iSeekStep;
+            l_iStartCur = l_iStartUp + l_iReadCur;
         }
 
-        if( l_iStartCur < l_iStart){
-           l_iStartCur = l_iStart;
-           l_iReadCur = l_iStartDown - l_iStartCur;
+        if( l_iStartCur < l_iStart) {
+            l_iStartCur = l_iStart;
+            l_iReadCur = l_iStartDown - l_iStartCur;
         }
     }
     fclose(l_pOutFile);
@@ -110,7 +139,7 @@ int main(int argc, char * argv[])
     return 0;
 
     // This is example that reads from end to start..
-    // 
+    //
     //fe_decode_open(argv[1]);
     //fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
     //

@@ -101,7 +101,11 @@ long fe_read_seek(long filepos)
 unsigned int fe_read_frame(char *buffer, int size)
 {
     AVPacket l_SPacket;
+#if LIBAVCODEC_VERSION_INT >= 3616100
+    AVFrame *l_pFrame = av_frame_alloc();
+#else
     AVFrame *l_pFrame = avcodec_alloc_frame();
+#endif
     int l_iCopySize = size * 2;
 
     int m_bReadLoop = 0;

@@ -30,7 +30,7 @@ int64_t m_lPcmLength = 0;
 int fe_decode_open(char *filename)
 {
     int i = -1;
-    AVDictionary *l_iFormatOpts = NULL; 
+    AVDictionary *l_iFormatOpts = NULL;
 
     printf("fe_decode_open: Decode audio file %s\n",
            filename);
@@ -39,7 +39,7 @@ int fe_decode_open(char *filename)
 
 // Enable this to use old slow MP3 Xing TOC
 #ifndef CODEC_ID_MP3
-    if ( LIBAVFORMAT_VERSION_INT > 3540580 ){
+    if ( LIBAVFORMAT_VERSION_INT > 3540580 ) {
         printf("fe_decode_open: Set usetoc to have old way of XING TOC reading (libavformat version: '%d')\n",LIBAVFORMAT_VERSION_INT);
         av_dict_set(&l_iFormatOpts, "usetoc", "0", 0);
     }
@@ -53,8 +53,8 @@ int fe_decode_open(char *filename)
     }
 
 #ifndef CODEC_ID_MP3
-    if ( LIBAVFORMAT_VERSION_INT > 3540580 && l_iFormatOpts != NULL ){
-       av_dict_free(&l_iFormatOpts);
+    if ( LIBAVFORMAT_VERSION_INT > 3540580 && l_iFormatOpts != NULL ) {
+        av_dict_free(&l_iFormatOpts);
     }
 #endif
 

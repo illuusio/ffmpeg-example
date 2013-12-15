@@ -153,6 +153,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
     printf(" From Sample: %d Hz Sample format: %s",
            m_pFormatCtx->streams[m_iAudioStream]->codec->sample_rate,
            av_get_sample_fmt_name(inSampleFmt));
+
     printf(" to 44100 Sample format: %s\n",
            av_get_sample_fmt_name(outSampleFmt));
 
