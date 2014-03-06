@@ -23,8 +23,7 @@
 #include "example3.h"
 #include "example4.h"
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char * argv[]) {
     int64_t i = 0;
     int64_t j = 0;
 //fe_read_seek(0);
@@ -48,11 +47,11 @@ int main(int argc, char * argv[])
     printf("Using Library: Avconv\n");
 #endif
 
-    printf("libavcodec version %d.%d.%d (%d)\n",LIBAVCODEC_VERSION_MAJOR,
+    printf("libavcodec version %d.%d.%d (%d)\n", LIBAVCODEC_VERSION_MAJOR,
            LIBAVCODEC_VERSION_MINOR,
            LIBAVCODEC_VERSION_MICRO,
            LIBAVCODEC_VERSION_INT);
-    printf("libavformat version %d.%d.%d (%d)\n",LIBAVFORMAT_VERSION_MAJOR,
+    printf("libavformat version %d.%d.%d (%d)\n", LIBAVFORMAT_VERSION_MAJOR,
            LIBAVFORMAT_VERSION_MINOR,
            LIBAVFORMAT_VERSION_MICRO,
            LIBAVFORMAT_VERSION_INT);
@@ -96,7 +95,7 @@ int main(int argc, char * argv[])
 
         for( i = 0; i <= l_iReadCur; i ++) {
             memset(l_strBuffer, 0x00, 65355);
-            printf("Loop: %ld/%ld\n", j,i);
+            printf("Loop: %ld/%ld\n", j, i);
             fe_read_seek(2304 * (i + l_iStartCur));
             l_iReadSize = fe_read_frame(l_strBuffer, 2304);
             fseek( l_pOutFile, (2304 * 2) * (i + l_iStartCur), SEEK_SET);
@@ -105,6 +104,7 @@ int main(int argc, char * argv[])
             //memset(l_strBuffer, 0x77, 65355);
             // fwrite(l_strBuffer, 100, 1, l_pOutFile);
         }
+
         if( l_iStartDown == 0 || l_iStartDown > l_iStartCur ) {
             l_iStartDown = l_iStartCur;
         }
@@ -117,6 +117,7 @@ int main(int argc, char * argv[])
             l_iSeekDirection = 1;
             l_iStartCur = l_iStartDown - (l_iStartDown / 2);
             l_iReadCur = l_iStartDown - l_iStartCur;
+
         } else {
             l_iSeekDirection = 0;
             l_iReadCur = l_iRead / l_iSeekStep;
@@ -128,6 +129,7 @@ int main(int argc, char * argv[])
             l_iReadCur = l_iStartDown - l_iStartCur;
         }
     }
+
     fclose(l_pOutFile);
 
     if (m_pCodecCtx != NULL) {
@@ -136,6 +138,7 @@ int main(int argc, char * argv[])
         m_pCodecCtx = NULL;
         m_pFormatCtx = NULL;
     }
+
     return 0;
 
     // This is example that reads from end to start..

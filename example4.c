@@ -29,8 +29,7 @@ int64_t m_iCurrentMixxTs = -1;
 int64_t m_iOffset = -1;
 int m_bIsSeeked = 0;
 
-long fe_read_seek(long filepos)
-{
+long fe_read_seek(long filepos) {
     int ret = 0;
     int64_t fspos = 0;
     int64_t l_lSeekPos = 0;
@@ -42,6 +41,7 @@ long fe_read_seek(long filepos)
 
     if( minus >= (2304 * 4) ) {
         minus -=  (2304 * 4);
+
     } else {
         minus = 0;
     }
@@ -85,7 +85,7 @@ long fe_read_seek(long filepos)
     printf("fe_read_seek: (RBP: %ld/%.4f) Req Byte: %ld \
            (Sec: %.4f PTS %ld) Real PTS %ld (Sec: %.4f Byte: %ld)\n",
            filepos,
-           (double)((double)filepos/(double)88200),
+           (double)((double)filepos / (double)88200),
            minus,
            (double)((double)minus / (double)88200),
            fspos,
@@ -98,8 +98,7 @@ long fe_read_seek(long filepos)
 }
 
 
-unsigned int fe_read_frame(char *buffer, int size)
-{
+unsigned int fe_read_frame(char *buffer, int size) {
     AVPacket l_SPacket;
 #if LIBAVCODEC_VERSION_INT >= 3616100
     AVFrame *l_pFrame = av_frame_alloc();
@@ -144,7 +143,7 @@ unsigned int fe_read_frame(char *buffer, int size)
     while (!m_bReadLoop) {
         if (av_read_frame(m_pFormatCtx, &l_SPacket) >= 0) {
             if (l_SPacket.stream_index == m_iAudioStream) {
-                ret = avcodec_decode_audio4(m_pCodecCtx,l_pFrame,&l_iFrameFinished,&l_SPacket);
+                ret = avcodec_decode_audio4(m_pCodecCtx, l_pFrame, &l_iFrameFinished, &l_SPacket);
 
                 if (ret <= 0) {
                     // An error or EOF occured,index break out and return what
@@ -187,6 +186,7 @@ unsigned int fe_read_frame(char *buffer, int size)
                                (long int)l_SPacket.pts,
                                (int64_t) round(l_fCurrentFFMPEGPosByte));
                         continue;
+
                     }  else if( l_iOffset >= m_pOutSize) {
                         l_iOffset -= m_pOutSize;
                         printf("fe_read_frame: Resample Offset left/readed: %ld/%ld (was: %ld) (PTS: %ld/%ld)\n",
@@ -218,6 +218,7 @@ unsigned int fe_read_frame(char *buffer, int size)
                             memcpy(buffer, m_pOut + l_iOffset, (m_pOutSize - l_iOffset));
                             buffer += (m_pOutSize - l_iOffset);
                             l_iCopiedBytes += (m_pOutSize - l_iOffset);
+
                         } else {
                             printf("fe_read_frame: Resampled Last Copy Size: %ld Readed: %ld Offset: %ld\n",
                                    (long int)l_iCopySize,
@@ -226,10 +227,12 @@ unsigned int fe_read_frame(char *buffer, int size)
                             memcpy(buffer, m_pOut, l_iCopySize);
                             l_iCopiedBytes += l_iCopySize;
                         }
+
                         l_iCopySize -= m_pOutSize - l_iOffset;
                         m_pOutSize = 0;
                         free(m_pOut);
                         m_pOut = NULL;
+
                     } else {
                         if( (l_iReadBytes - l_iOffset) < l_iCopySize ) {
                             printf("fe_read_frame: Copy Size: %ld Readed: %ld Offset: %ld Copied: %ld\n",
@@ -240,6 +243,7 @@ unsigned int fe_read_frame(char *buffer, int size)
                             memcpy(buffer, l_pFrame->data[0] + l_iOffset, (l_iReadBytes - l_iOffset));
                             buffer += (l_iReadBytes - l_iOffset);
                             l_iCopiedBytes += (l_iReadBytes - l_iOffset);
+
                         } else {
                             printf("fe_read_frame: Last Copy Size: %ld Readed: %ld Offset: %ld\n",
                                    (long int)l_iCopySize,
@@ -248,8 +252,10 @@ unsigned int fe_read_frame(char *buffer, int size)
                             memcpy(buffer, l_pFrame->data[0], l_iCopySize);
                             l_iCopiedBytes += l_iCopySize;
                         }
+
                         l_iCopySize -= l_iReadBytes - l_iOffset;
                     }
+
                     l_iOffset = 0;
 
                     if( l_iCopySize <= 0) {

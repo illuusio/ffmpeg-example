@@ -21,14 +21,12 @@
 #include "example3.h"
 
 
-double fe_convert_toByteOffset(double pts, unsigned int samplerate, const AVRational *ffmpegtime)
-{
+double fe_convert_toByteOffset(double pts, unsigned int samplerate, const AVRational *ffmpegtime) {
     return (pts / (double)ffmpegtime->den * (double)samplerate *
             (double)2.);
 }
 
-double fe_convert_fromByteOffset(double byteoffset, unsigned int samplerate, const AVRational *ffmpegtime)
-{
+double fe_convert_fromByteOffset(double byteoffset, unsigned int samplerate, const AVRational *ffmpegtime) {
     return (byteoffset / (double)samplerate / (double)2.) *
            (double)ffmpegtime->den;
 }

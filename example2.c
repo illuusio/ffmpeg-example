@@ -46,8 +46,7 @@ unsigned int m_pOutSize = -1;
 
 
 int fe_resample_open(enum AVSampleFormat inSampleFmt,
-                     enum AVSampleFormat outSampleFmt)
-{
+                     enum AVSampleFormat outSampleFmt) {
     m_pOutSampleFmt = outSampleFmt;
     m_pInSampleFmt = inSampleFmt;
 
@@ -56,8 +55,10 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
     // They are stereo not 5.1
     if (m_pCodecCtx->channel_layout == 0 && m_pCodecCtx->channels == 2) {
         m_pCodecCtx->channel_layout = AV_CH_LAYOUT_STEREO;
+
     } else if (m_pCodecCtx->channel_layout == 0 && m_pCodecCtx->channels == 1) {
         m_pCodecCtx->channel_layout = AV_CH_LAYOUT_MONO;
+
     } else if (m_pCodecCtx->channel_layout == 0 && m_pCodecCtx->channels == 0) {
         m_pCodecCtx->channel_layout = AV_CH_LAYOUT_STEREO;
         m_pCodecCtx->channels = 2;
@@ -108,12 +109,12 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
         m_pSwrCtx = swr_alloc();
 #endif
 
-        av_opt_set_int(m_pSwrCtx,"in_channel_layout", m_pCodecCtx->channel_layout, 0);
-        av_opt_set_int(m_pSwrCtx,"in_sample_fmt", inSampleFmt, 0);
-        av_opt_set_int(m_pSwrCtx,"in_sample_rate", m_pCodecCtx->sample_rate, 0);
-        av_opt_set_int(m_pSwrCtx,"out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
-        av_opt_set_int(m_pSwrCtx,"out_sample_fmt", outSampleFmt, 0);
-        av_opt_set_int(m_pSwrCtx,"out_sample_rate", m_pCodecCtx->sample_rate, 0);
+        av_opt_set_int(m_pSwrCtx, "in_channel_layout", m_pCodecCtx->channel_layout, 0);
+        av_opt_set_int(m_pSwrCtx, "in_sample_fmt", inSampleFmt, 0);
+        av_opt_set_int(m_pSwrCtx, "in_sample_rate", m_pCodecCtx->sample_rate, 0);
+        av_opt_set_int(m_pSwrCtx, "out_channel_layout", AV_CH_LAYOUT_STEREO, 0);
+        av_opt_set_int(m_pSwrCtx, "out_sample_fmt", outSampleFmt, 0);
+        av_opt_set_int(m_pSwrCtx, "out_sample_rate", m_pCodecCtx->sample_rate, 0);
 
 #else
         printf("ffmpeg: OLD FFMPEG API in use!\n");
@@ -129,6 +130,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
                                            0.8);
 
 #endif
+
         if (!m_pSwrCtx) {
             printf("Can't init convertor!\n");
             return -1;
@@ -138,14 +140,17 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
         // If it not working let user know about it!
         // If we don't do this we'll gonna crash
 #ifdef __LIBAVRESAMPLE__
+
         if (avresample_open(m_pSwrCtx) < 0) {
 #else
+
         if (swr_init(m_pSwrCtx) < 0) {
 #endif
             printf("Can't init convertor\n");
             m_pSwrCtx = NULL;
             return -1;
         }
+
 #endif
 
     }
@@ -160,8 +165,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
     return 0;
 }
 
-unsigned int fe_resample_do(AVFrame *inframe)
-{
+unsigned int fe_resample_do(AVFrame *inframe) {
 
     if (m_pSwrCtx) {
 
@@ -210,6 +214,7 @@ unsigned int fe_resample_do(AVFrame *inframe)
             printf("fe_resample_do: Alloc not succeedeed\n");
             return -1;
         }
+
 #else
         int l_iOutSamples = av_rescale_rnd(inframe->nb_samples,
                                            m_pCodecCtx->sample_rate,
@@ -259,12 +264,15 @@ unsigned int fe_resample_do(AVFrame *inframe)
                                 inframe->nb_samples);
 
 #endif
+
         if (l_iLen < 0) {
             printf("Sample format conversion failed!\n");
             return -1;
         }
+
         m_pOutSize = l_iOutBytes;
         return l_iOutBytes;
+
     } else {
         return 0;
     }

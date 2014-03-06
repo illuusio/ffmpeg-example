@@ -27,8 +27,7 @@ int m_iAudioStream = -1;
 AVCodec *m_pCodec = NULL;
 int64_t m_lPcmLength = 0;
 
-int fe_decode_open(char *filename)
-{
+int fe_decode_open(char *filename) {
     int i = -1;
     AVDictionary *l_iFormatOpts = NULL;
 
@@ -39,23 +38,27 @@ int fe_decode_open(char *filename)
 
 // Enable this to use old slow MP3 Xing TOC
 #ifndef CODEC_ID_MP3
+
     if ( LIBAVFORMAT_VERSION_INT > 3540580 ) {
-        printf("fe_decode_open: Set usetoc to have old way of XING TOC reading (libavformat version: '%d')\n",LIBAVFORMAT_VERSION_INT);
+        printf("fe_decode_open: Set usetoc to have old way of XING TOC reading (libavformat version: '%d')\n", LIBAVFORMAT_VERSION_INT);
         av_dict_set(&l_iFormatOpts, "usetoc", "0", 0);
     }
+
 #endif
 
     // Open file and make m_pFormatCtx
-    if (avformat_open_input(&m_pFormatCtx,filename, NULL, &l_iFormatOpts)!=0) {
+    if (avformat_open_input(&m_pFormatCtx, filename, NULL, &l_iFormatOpts) != 0) {
         printf("fe_decode_open: cannot open: %s\n",
                filename);
         return -1;
     }
 
 #ifndef CODEC_ID_MP3
+
     if ( LIBAVFORMAT_VERSION_INT > 3540580 && l_iFormatOpts != NULL ) {
         av_dict_free(&l_iFormatOpts);
     }
+
 #endif
 
     m_pFormatCtx->max_analyze_duration = 999999999;
@@ -63,7 +66,7 @@ int fe_decode_open(char *filename)
 
 
     // Retrieve stream information
-    if (avformat_find_stream_info(m_pFormatCtx, NULL)<0) {
+    if (avformat_find_stream_info(m_pFormatCtx, NULL) < 0) {
         printf("fe_decode_open: cannot open %s\n",
                filename);
         return -1;
@@ -72,33 +75,33 @@ int fe_decode_open(char *filename)
     av_dump_format(m_pFormatCtx, 0, filename, 0);
 
     // Find the first video stream
-    m_iAudioStream=-1;
+    m_iAudioStream = -1;
 
-    for (i=0; i<m_pFormatCtx->nb_streams; i++) {
-        if (m_pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_AUDIO) {
-            m_iAudioStream=i;
+    for (i = 0; i < m_pFormatCtx->nb_streams; i++) {
+        if (m_pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+            m_iAudioStream = i;
             break;
         }
     }
 
-    if (m_iAudioStream==-1) {
+    if (m_iAudioStream == -1) {
         printf("fe_decode_open: cannot find an audio stream: cannot open %s",
                filename);
         return -1;
     }
 
     // Get a pointer to the codec context for the video stream
-    m_pCodecCtx=m_pFormatCtx->streams[m_iAudioStream]->codec;
+    m_pCodecCtx = m_pFormatCtx->streams[m_iAudioStream]->codec;
 
     // Find the decoder for the audio stream
-    if (!(m_pCodec=avcodec_find_decoder(m_pCodecCtx->codec_id))) {
+    if (!(m_pCodec = avcodec_find_decoder(m_pCodecCtx->codec_id))) {
         printf("fe_decode_open: cannot find a decoder for %s\n",
                filename);
         return -1;
     }
 
 
-    if (avcodec_open2(m_pCodecCtx, m_pCodec, NULL)<0) {
+    if (avcodec_open2(m_pCodecCtx, m_pCodec, NULL) < 0) {
         printf("fe_decode_open:  cannot open %s\n",
                filename);
         return -1;
