@@ -284,8 +284,12 @@ unsigned int fe_read_frame(char *buffer, int size) {
     av_free( l_SPacket.data );
     l_SPacket.data = NULL;
     l_SPacket.size = 0;
-    avcodec_get_frame_defaults(l_pFrame);
 
+#if LIBAVFORMAT_VERSION_INT < 3613028
+       avcodec_get_frame_defaults(l_pFrame);
+#else
+       av_frame_unref(l_pFrame);
+#endif
 
     printf("fe_read_frame: Readed bytes %ld Copied bytes: %ld\n", l_iReadedBytes, l_iCopiedBytes);
     return l_iCopiedBytes;
