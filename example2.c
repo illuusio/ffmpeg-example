@@ -64,7 +64,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
         m_pCodecCtx->channels = 2;
     }
 
-    printf("Rate: %d Channels %d Channels: %d\n",
+    printf("fe_resample_open: Rate: %d Channels %d Channels: %d\n",
            (int) m_pCodecCtx->sample_rate,
            (int) m_pCodecCtx->channel_layout,
            (int) m_pCodecCtx->channels);
@@ -80,7 +80,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
     if ((inSampleFmt != outSampleFmt || m_pCodecCtx->sample_rate != 44100 ||
             m_pCodecCtx->channel_layout != AV_CH_LAYOUT_STEREO) && m_pSwrCtx == NULL) {
         if (m_pSwrCtx != NULL) {
-            printf("Freeing Resample context\n");
+            printf("fe_resample_open: Freeing Resample context\n");
 
 // __FFMPEGOLDAPI__ Is what is used in FFMPEG < 0.10 and libav < 0.8.3. NO
 // libresample available..
@@ -102,10 +102,10 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
 #ifndef __FFMPEGOLDAPI__
 
 #ifdef __LIBAVRESAMPLE__
-        printf("ffmpeg: NEW FFMPEG API using libavresample\n");
+        printf("fe_resample_open: ffmpeg: NEW FFMPEG API using libavresample\n");
         m_pSwrCtx = avresample_alloc_context();
 #else
-        printf("ffmpeg: NEW FFMPEG API using libswresample\n");
+        printf("fe_resample_open: ffmpeg: NEW FFMPEG API using libswresample\n");
         m_pSwrCtx = swr_alloc();
 #endif
 
@@ -117,7 +117,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
         av_opt_set_int(m_pSwrCtx, "out_sample_rate", m_pCodecCtx->sample_rate, 0);
 
 #else
-        printf("ffmpeg: OLD FFMPEG API in use!\n");
+        printf("fe_resample_open: ffmpeg: OLD FFMPEG API in use!\n");
         m_pSwrCtx = av_audio_resample_init(2,
                                            m_pCodecCtx->channels,
                                            m_pCodecCtx->sample_rate,
@@ -132,7 +132,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
 #endif
 
         if (!m_pSwrCtx) {
-            printf("Can't init convertor!\n");
+            printf("fe_resample_open: Can't init convertor!\n");
             return -1;
         }
 
@@ -146,7 +146,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
 
         if (swr_init(m_pSwrCtx) < 0) {
 #endif
-            printf("Can't init convertor\n");
+            printf("fe_resample_open: Can't init convertor\n");
             m_pSwrCtx = NULL;
             return -1;
         }
@@ -155,7 +155,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
 
     }
 
-    printf(" From Sample: %d Hz Sample format: %s",
+    printf("fe_resample_open: From Sample: %d Hz Sample format: %s",
            m_pFormatCtx->streams[m_iAudioStream]->codec->sample_rate,
            av_get_sample_fmt_name(inSampleFmt));
 

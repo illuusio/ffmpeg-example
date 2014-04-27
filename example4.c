@@ -25,7 +25,7 @@
 
 int64_t m_iSeekOffset = -1;
 int64_t m_iLastFirstFfmpegByteOffset = -1;
-int64_t m_iCurrentMixxTs = -1;
+int64_t m_iCurrentTs = -1;
 int64_t m_iOffset = -1;
 int m_bIsSeeked = 0;
 
@@ -41,13 +41,12 @@ long fe_read_seek(long filepos) {
 
     if( minus >= (2304 * 4) ) {
         minus -=  (2304 * 4);
-
     } else {
         minus = 0;
     }
 
     fspos = (int64_t) round(fe_convert_fromByteOffset((double)minus, 44100, &time_base));
-    m_iCurrentMixxTs = filepos;
+    m_iCurrentTs = filepos;
 
     m_iOffset = 0;
 
@@ -82,8 +81,7 @@ long fe_read_seek(long filepos) {
     m_iSeekOffset = (int64_t) round((double)l_lSeekPos / 2304);
     m_iSeekOffset *= 2304;
 
-    printf("fe_read_seek: (RBP: %ld/%.4f) Req Byte: %ld \
-           (Sec: %.4f PTS %ld) Real PTS %ld (Sec: %.4f Byte: %ld)\n",
+    printf("fe_read_seek: (RBP: %ld/%.4f) Req Byte: %ld (Sec: %.4f PTS %ld) Real PTS %ld (Sec: %.4f Byte: %ld)\n",
            filepos,
            (double)((double)filepos / (double)88200),
            minus,
@@ -114,10 +112,6 @@ unsigned int fe_read_frame(char *buffer, int size) {
     double l_fCurrentFFMPEGPosSec = 0;
     double l_fCurrentFFMPEGPosByte = 0;
 
-
-    //double l_fFromMixxPosSec = 0;
-    //double l_fToMixxPosSec = 0;
-
     int ret = 0;
     int64_t l_iOffset = 0;
     int64_t l_iReadedBytes = 0;
@@ -131,14 +125,6 @@ unsigned int fe_read_frame(char *buffer, int size) {
     l_SPacket.size = 0;
     av_init_packet(&l_SPacket);
 
-    // Mostly for debug
-    // l_fFromMixxPosSec = (((double)m_iCurrentMixxTs / (double)44100)) / 2;
-    // l_fToMixxPosSec = ((((double)m_iCurrentMixxTs + (double)size) / (double)44100)) / 2;
-
-
-    //printf("fe_read_frame: FROM Mixxx t: %.4f (Byte: %ld)\n", l_fFromMixxPosSec, m_iCurrentMixxTs);
-    //printf("fe_read_frame: TO   Mixxx t: %.4f (Byte: %ld)\n", l_fToMixxPosSec, (m_iCurrentMixxTs + size));
-
     //while (readByteArray.size() < needed)
     while (!m_bReadLoop) {
         if (av_read_frame(m_pFormatCtx, &l_SPacket) >= 0) {
@@ -149,8 +135,6 @@ unsigned int fe_read_frame(char *buffer, int size) {
                     // An error or EOF occured,index break out and return what
                     // we have so far.
                     printf("fe_read_frame: EOF (%d)!\n", ret);
-                    //m_bReadLoop = 1;
-                    //break;
                 }
 
                 //frame->
@@ -160,19 +144,17 @@ unsigned int fe_read_frame(char *buffer, int size) {
                                    l_pFrame->nb_samples,
                                    m_pCodecCtx->sample_fmt, 1);
 
-                    l_iReadedBytes += (l_iReadBytes / 2);
-
                     l_fCurrentFFMPEGPosSec = l_SPacket.pts * av_q2d(m_pFormatCtx->streams[m_iAudioStream]->time_base);
 
                     l_fCurrentFFMPEGPosByte = fe_convert_toByteOffset((double)l_SPacket.pts, 44100,
                                               &m_pFormatCtx->streams[m_iAudioStream]->time_base);
 
 
-                    if( m_iCurrentMixxTs > l_fCurrentFFMPEGPosByte && l_iOffset == 0) {
-                        l_iOffset = m_iCurrentMixxTs - (int64_t) round(l_fCurrentFFMPEGPosByte);
+                    if( m_iCurrentTs > l_fCurrentFFMPEGPosByte && l_iOffset == 0) {
+                        l_iOffset = m_iCurrentTs - (int64_t) round(l_fCurrentFFMPEGPosByte);
                         printf("fe_read_frame: Offset %ld = %ld - %ld\n",
                                l_iOffset,
-                               m_iCurrentMixxTs,
+                               m_iCurrentTs,
                                (int64_t) round(l_fCurrentFFMPEGPosByte));
                         l_iOffset *= 2;
                     }
@@ -198,8 +180,7 @@ unsigned int fe_read_frame(char *buffer, int size) {
                         continue;
                     }
 
-                    printf("fe_read_frame: FFMPEG Sec %.4f (Byte: %ld) \
-                            Got bytes: (%d @ PTS %ld) (buffered: %ld/%ld)\n",
+                    printf("fe_read_frame: Cur Sec %.4f (Byte: %ld) Got bytes: (%d @ PTS %ld) (buffered: %ld/%ld)\n",
                            l_fCurrentFFMPEGPosSec,
                            (long int) round(l_fCurrentFFMPEGPosByte),
                            l_iReadBytes,
@@ -207,6 +188,8 @@ unsigned int fe_read_frame(char *buffer, int size) {
                            (long int) l_iReadedBytes,
                            (long int) l_iCopySize);
 
+		    l_iReadedBytes += (l_iReadBytes / 2);
+		    
                     if( m_pOut != NULL ) {
 
                         if( (m_pOutSize - l_iOffset) < l_iCopySize ) {
@@ -227,7 +210,7 @@ unsigned int fe_read_frame(char *buffer, int size) {
                             memcpy(buffer, m_pOut, l_iCopySize);
                             l_iCopiedBytes += l_iCopySize;
                         }
-
+                        
                         l_iCopySize -= m_pOutSize - l_iOffset;
                         m_pOutSize = 0;
                         free(m_pOut);
@@ -273,7 +256,6 @@ unsigned int fe_read_frame(char *buffer, int size) {
             //break;
         }
 
-        printf("fe_read_frame: Free package!\n");
         av_free_packet(&l_SPacket);
         l_SPacket.data = NULL;
         l_SPacket.size = 0;
