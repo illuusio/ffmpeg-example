@@ -1,5 +1,5 @@
 AC_PREREQ([2.57])
-AC_INIT([ffmpeg-example], [131027], [https://github.com/illuusio], [ffmpeg-example], [https://github.com/illuusio])
+AC_INIT([ffmpeg-example], [140427], [https://github.com/illuusio], [ffmpeg-example], [https://github.com/illuusio])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AC_CONFIG_MACRO_DIR([m4])
 
