@@ -18,28 +18,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#define FFMPEG_EXAMPLE_STEP 32768
+
 #include "example1.h"
 #include "example2.h"
 #include "example3.h"
 #include "example4.h"
 
 int main(int argc, char * argv[]) {
-    int64_t i = 0;
+    //int64_t i = 0;
     int64_t j = 0;
+
 //fe_read_seek(0);
-    char l_strBuffer[65355];
+    char l_strBuffer[(FFMPEG_EXAMPLE_STEP * 2)];
+    char l_strBuffer2[(FFMPEG_EXAMPLE_STEP * 2)];
     FILE *l_pOutFile = NULL;
     int l_iReadSize = 0;
-    int64_t l_iRead = 200;
-    int64_t l_iStart = 1000;
-    int64_t l_iStartCur = 0;
-    int64_t l_iReadCur = 0;
-    int64_t l_iStartUp = 0;
-    int64_t l_iStartDown = 0;
-    int64_t l_iSeekDirection = 0;
-    int64_t l_iSeekStep = 50;
+    //int64_t l_iRead = 200;
+    //int64_t l_iStart = 1000;
+    //int64_t l_iStartCur = 0;
+    //int64_t l_iReadCur = 0;
+    //int64_t l_iStartUp = 0;
+    //int64_t l_iStartDown = 0;
+    //int64_t l_iSeekDirection = 0;
+    //int64_t l_iSeekStep = 50;
 
-
+    int64_t l_lSeekStartPoint = 0;
+    //int64_t l_lSeekMiddleLowPoint = 0;
+    //int64_t l_lSeekMiddleHighPoint = 0;
+    //int64_t l_lSeekEndPoint = 0;
+    
 // FFMPEG uses SOMETHING_MICRO > 100 and Avconv under
 #if LIBAVCODEC_VERSION_MICRO >= 100
     printf("Using Library: FFmpeg\n");
@@ -64,21 +72,36 @@ int main(int argc, char * argv[]) {
         return 0;
     }
 
-
-
-
     av_register_all();
     avcodec_register_all();
     fe_decode_open(argv[1]);
     fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
 
-
-
     l_pOutFile = fopen("out-for.pcm", "w+");
+    
+    // l_lSeekMiddleLowPoint = l_lSeekMiddleHighPoint = (m_lPcmLength / 2);
+   
+    
+    memset(l_strBuffer, 0x99, (FFMPEG_EXAMPLE_STEP * 2));
+    memset(l_strBuffer2, 0x88, (FFMPEG_EXAMPLE_STEP * 2));
 
-    memset(l_strBuffer, 0x99, 65355);
+    for( j = 0; j < 2; j ++) {
+            printf("main: Ask reading %ld (23040 bytes)\n",l_lSeekStartPoint);
+            fe_read_seek(l_lSeekStartPoint);
+            //l_iReadSize = fe_read_frame(l_strBuffer, FFMPEG_EXAMPLE_STEP);
+            l_iReadSize = fe_read_frame(l_strBuffer, 23040);
+            // fseek( l_pOutFile, l_lSeekStartPoint, SEEK_SET);
+            fwrite(l_strBuffer, l_iReadSize, 1, l_pOutFile);
+            fwrite(l_strBuffer2, 1024, 1, l_pOutFile);
+	    //l_lSeekStartPoint += FFMPEG_EXAMPLE_STEP;
+	    l_lSeekStartPoint += 23040;
 
-    for( i = l_iStart; i < l_iRead; i ++) {
+      
+    }
+
+    
+    
+    /*for( i = l_iStart; i < l_iRead; i ++) {
         fwrite(l_strBuffer, 4608, 1, l_pOutFile);
     }
 
@@ -95,7 +118,7 @@ int main(int argc, char * argv[]) {
 
         for( i = 0; i <= l_iReadCur; i ++) {
             memset(l_strBuffer, 0x00, 65355);
-            printf("Loop: %ld/%ld\n", j, i);
+            printf("Loop: %ld/%ld (@%ld of %ld)\n", j, i, (2304 * (i + l_iStartCur)), m_lPcmLength);
             fe_read_seek(2304 * (i + l_iStartCur));
             l_iReadSize = fe_read_frame(l_strBuffer, 2304);
             fseek( l_pOutFile, (2304 * 2) * (i + l_iStartCur), SEEK_SET);
@@ -129,7 +152,8 @@ int main(int argc, char * argv[]) {
             l_iReadCur = l_iStartDown - l_iStartCur;
         }
     }
-
+    */
+ 
     fclose(l_pOutFile);
 
     if (m_pCodecCtx != NULL) {
@@ -138,8 +162,6 @@ int main(int argc, char * argv[]) {
         m_pCodecCtx = NULL;
         m_pFormatCtx = NULL;
     }
-
-    return 0;
 
     // This is example that reads from end to start..
     //
@@ -167,11 +189,6 @@ int main(int argc, char * argv[]) {
     //
     //fclose(l_pOutFile);
 
-    if (m_pCodecCtx != NULL) {
-        avcodec_close(m_pCodecCtx);
-        avformat_close_input(&m_pFormatCtx);
-    }
-
     if (m_pSwrCtx != NULL) {
 #ifndef __FFMPEGOLDAPI__
 
@@ -185,8 +202,6 @@ int main(int argc, char * argv[]) {
         audio_resample_close(m_pSwrCtx);
 #endif
     }
-
-
 
     return 0;
 }
