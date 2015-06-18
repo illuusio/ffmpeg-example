@@ -61,9 +61,9 @@ int fe_decode_open(char *filename) {
 
 #endif
 
+#if LIBAVCODEC_VERSION_INT < 3622144
     m_pFormatCtx->max_analyze_duration = 999999999;
-
-
+#endif
 
     // Retrieve stream information
     if (avformat_find_stream_info(m_pFormatCtx, NULL) < 0) {
