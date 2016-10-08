@@ -1,7 +1,7 @@
 FFmpeg-example
 ==============
 
-[FFmpeg](http://ffmpeg.org/) 0.11/1.0/1.1/1.2/2.0 or [Libav](http://libav.org/) 0.8/9 example application with byte exact reading 
+[FFmpeg](http://ffmpeg.org/) 0.11-3.2 or [Libav](http://libav.org/) 0.8-11 example application with byte exact reading 
 
 FFmpeg/Libav example program
 ============================
