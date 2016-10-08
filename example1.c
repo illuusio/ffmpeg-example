@@ -48,7 +48,7 @@ int fe_decode_open(char *filename) {
 
     // Open file and make m_pFormatCtx
     if (avformat_open_input(&m_pFormatCtx, filename, NULL, &l_iFormatOpts) != 0) {
-        printf("fe_decode_open: cannot open: %s\n",
+        printf("fe_decode_open: cannot open with 'avformat_open_input': %s\n",
                filename);
         return -1;
     }
@@ -67,15 +67,17 @@ int fe_decode_open(char *filename) {
 
     // Retrieve stream information
     if (avformat_find_stream_info(m_pFormatCtx, NULL) < 0) {
-        printf("fe_decode_open: cannot open '%s'\n",
+        printf("fe_decode_open: cannot open find info '%s'\n",
                filename);
-        return -1;
+        printf("As documentation says this is pretty normal. So this not show stopper!\n");
     }
 
     av_dump_format(m_pFormatCtx, 0, filename, 0);
 
     // Find the first video stream
     m_iAudioStream = -1;
+
+    printf("fe_decode_open: File got streams: %d\n", m_pFormatCtx->nb_streams);
 
     for (i = 0; i < m_pFormatCtx->nb_streams; i++) {
 // If we have FFMpeg version which is less than 3.2 then we use older implementation
@@ -114,18 +116,38 @@ int fe_decode_open(char *filename) {
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
     // Get a pointer to the codec context for the video stream
     m_pCodecCtx = m_pFormatCtx->streams[m_iAudioStream]->codec;
+
 #else
     // Get a pointer to the codec context for the video stream
-    m_pCodecCtx = avcodec_alloc_context3(m_pCodec);
-#endif
+    //m_pCodecCtx = avcodec_alloc_context3(m_pCodec);
+    m_pCodecCtx = avcodec_alloc_context3(NULL);
 
-    if (avcodec_open2(m_pCodecCtx, m_pCodec, NULL) < 0) {
-        printf("fe_decode_open:  cannot open %s\n",
+    // Add stream parameters to context
+    if(avcodec_parameters_to_context(m_pCodecCtx, m_pFormatCtx->streams[m_iAudioStream]->codecpar)) {
+        printf("fe_decode_open: cannot add Codec parameters: %s\n",
                filename);
         return -1;
     }
 
+    // Se timebase correct
+    av_codec_set_pkt_timebase(m_pCodecCtx, m_pFormatCtx->streams[m_iAudioStream]->time_base);
 
+    // Make sure that Codecs are identical or  avcodec_open2 fails.
+    m_pCodecCtx->codec_id = m_pCodec->id;
+#endif
+
+    if(!m_pCodecCtx) {
+        printf("fe_decode_open: cannot get 'AVCodecContext'\n");
+        return -1;
+    }
+
+    if (avcodec_open2(m_pCodecCtx, m_pCodec, NULL) < 0) {
+        printf("fe_decode_open: cannot open with 'avcodec_open2' codec_id: %d Audio stream id: %d: %s\n",
+               m_pFormatCtx->streams[m_iAudioStream]->codecpar->codec_id,
+               m_iAudioStream, filename
+              );
+        return -1;
+    }
 
     printf("fe_decode_open: PCM Length is: %f (Bytes: %ld)\n",
            (double)(m_pFormatCtx->duration / AV_TIME_BASE),

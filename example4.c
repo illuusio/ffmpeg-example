@@ -137,20 +137,29 @@ unsigned int fe_read_frame(char *buffer, int size) {
 
                 if (ret <= 0) {
 #else
-                ret = avcodec_send_packet(m_pCodecCtx, &l_SPacket);
 
-                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL)) {
-                    printf("fe_read_frame: Frame getting error (%d)!\n", ret);
-                    return 0;
-                }
+                // AVERROR(EAGAIN) means that we need to feed more
+                // That we can decode Frame or Packet
+                do {
+                    do {
+                        ret = avcodec_send_packet(m_pCodecCtx, &l_SPacket);
+                    } while(ret == AVERROR(EAGAIN));
 
-                ret = avcodec_receive_frame(m_pCodecCtx, l_pFrame);
+                    if(ret == AVERROR_EOF || ret == AVERROR(EINVAL)) {
+                        printf("AVERROR(EAGAIN): %d, AVERROR_EOF: %d, AVERROR(EINVAL): %d\n", AVERROR(EAGAIN), AVERROR_EOF, AVERROR(EINVAL));
+                        printf("fe_read_frame: Frame getting error (%d)!\n", ret);
+                        return 0;
+                    }
 
-                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL)) {
+                    ret = avcodec_receive_frame(m_pCodecCtx, l_pFrame);
+                } while(ret == AVERROR(EAGAIN));
+
+                if(ret == AVERROR_EOF || ret == AVERROR(EINVAL)) {
 #endif
 
                     // An error or EOF occured,index break out and return what
                     // we have so far.
+                    printf("AVERROR(EAGAIN): %d, AVERROR_EOF: %d, AVERROR(EINVAL): %d\n", AVERROR(EAGAIN), AVERROR_EOF, AVERROR(EINVAL));
                     printf("fe_read_frame: EOF or some othere decoding error (%d)!\n", ret);
                     return 0;
                 }

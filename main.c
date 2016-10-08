@@ -74,11 +74,12 @@ int main(int argc, char * argv[]) {
 
     av_register_all();
     avcodec_register_all();
-    if(fe_decode_open(argv[1]) < 0)
-    {
+
+    if(fe_decode_open(argv[1]) < 0) {
         printf("main: Can't open file exiting!\n");
         return -1;
     }
+
     fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
 
     l_pOutFile = fopen("out-for.pcm", "w+");
