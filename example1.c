@@ -67,7 +67,7 @@ int fe_decode_open(char *filename) {
 
     // Retrieve stream information
     if (avformat_find_stream_info(m_pFormatCtx, NULL) < 0) {
-        printf("fe_decode_open: cannot open %s\n",
+        printf("fe_decode_open: cannot open '%s'\n",
                filename);
         return -1;
     }
