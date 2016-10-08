@@ -129,16 +129,38 @@ unsigned int fe_read_frame(char *buffer, int size) {
     while (!m_bReadLoop) {
         if (av_read_frame(m_pFormatCtx, &l_SPacket) >= 0) {
             if (l_SPacket.stream_index == m_iAudioStream) {
+
+// If we have FFMpeg version which is less than 3.2 then we use older implementation
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
                 ret = avcodec_decode_audio4(m_pCodecCtx, l_pFrame, &l_iFrameFinished, &l_SPacket);
 
                 if (ret <= 0) {
-                    // An error or EOF occured,index break out and return what
-                    // we have so far.
-                    printf("fe_read_frame: EOF (%d)!\n", ret);
+#else
+                ret = avcodec_send_packet(m_pCodecCtx, &l_SPacket);
+                
+                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL))
+                {
+                    printf("fe_read_frame: Frame getting error (%d)!\n", ret);
+                    return 0;
                 }
 
+                ret = avcodec_receive_frame(m_pCodecCtx, l_pFrame);
+
+                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL))
+                {
+#endif
+                
+                    // An error or EOF occured,index break out and return what
+                    // we have so far.
+                    printf("fe_read_frame: EOF or some othere decoding error (%d)!\n", ret);
+                    return 0;
+                }
+
+// If we have FFMpeg version which is less than 3.2 then we use older implementation
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
                 //frame->
                 if (l_iFrameFinished) {
+#endif
                     fe_resample_do(l_pFrame);
                     l_iReadBytes = av_samples_get_buffer_size(NULL, m_pCodecCtx->channels,
                                    l_pFrame->nb_samples,
@@ -244,11 +266,12 @@ unsigned int fe_read_frame(char *buffer, int size) {
                     if( l_iCopySize <= 0) {
                         m_bReadLoop = 1;
                     }
-
+// If we have FFMpeg version which is less than 3.2 then we use older implementation
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
                 } else {
                     printf("fe_read_frame: libavcodec 'avcodec_decode_audio4' didn't succeed or frame not finished (File could also just end!)\n");
                 }
-
+#endif
             }
 
         } else {
@@ -256,7 +279,12 @@ unsigned int fe_read_frame(char *buffer, int size) {
             //break;
         }
 
+// If we have FFMpeg version which is less than 3.2 then we use older implementation
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
         av_free_packet(&l_SPacket);
+#else
+        av_packet_unref(&l_SPacket);
+#endif
         l_SPacket.data = NULL;
         l_SPacket.size = 0;
         av_init_packet(&l_SPacket);

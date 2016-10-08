@@ -155,10 +155,17 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
 
     }
 
+// If we have FFMpeg version which is less than 3.2 then we use older implementation
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
     printf("fe_resample_open: From Sample: %d Hz Sample format: %s",
            m_pFormatCtx->streams[m_iAudioStream]->codec->sample_rate,
            av_get_sample_fmt_name(inSampleFmt));
-
+#else
+    printf("fe_resample_open: From Sample: %d Hz Sample format: %s",
+           m_pFormatCtx->streams[m_iAudioStream]->codecpar->sample_rate,
+           av_get_sample_fmt_name(inSampleFmt));
+#endif
+    
     printf(" to 44100 Sample format: %s\n",
            av_get_sample_fmt_name(outSampleFmt));
 
