@@ -47,7 +47,7 @@ int main(int argc, char * argv[]) {
     //int64_t l_lSeekMiddleLowPoint = 0;
     //int64_t l_lSeekMiddleHighPoint = 0;
     //int64_t l_lSeekEndPoint = 0;
-    
+
 // FFMPEG uses SOMETHING_MICRO > 100 and Avconv under
 #if LIBAVCODEC_VERSION_MICRO >= 100
     printf("Using Library: FFmpeg\n");
@@ -78,29 +78,29 @@ int main(int argc, char * argv[]) {
     fe_resample_open(m_pCodecCtx->sample_fmt, AV_SAMPLE_FMT_S16);
 
     l_pOutFile = fopen("out-for.pcm", "w+");
-    
+
     // l_lSeekMiddleLowPoint = l_lSeekMiddleHighPoint = (m_lPcmLength / 2);
-   
-    
+
+
     memset(l_strBuffer, 0x99, (FFMPEG_EXAMPLE_STEP * 2));
     memset(l_strBuffer2, 0x88, (FFMPEG_EXAMPLE_STEP * 2));
 
     for( j = 0; j < 2; j ++) {
-            printf("main: Ask reading %ld (23040 bytes)\n",l_lSeekStartPoint);
-            fe_read_seek(l_lSeekStartPoint);
-            //l_iReadSize = fe_read_frame(l_strBuffer, FFMPEG_EXAMPLE_STEP);
-            l_iReadSize = fe_read_frame(l_strBuffer, 23040);
-            // fseek( l_pOutFile, l_lSeekStartPoint, SEEK_SET);
-            fwrite(l_strBuffer, l_iReadSize, 1, l_pOutFile);
-            fwrite(l_strBuffer2, 1024, 1, l_pOutFile);
-	    //l_lSeekStartPoint += FFMPEG_EXAMPLE_STEP;
-	    l_lSeekStartPoint += 23040;
+        printf("main: Ask reading %ld (23040 bytes)\n", l_lSeekStartPoint);
+        fe_read_seek(l_lSeekStartPoint);
+        //l_iReadSize = fe_read_frame(l_strBuffer, FFMPEG_EXAMPLE_STEP);
+        l_iReadSize = fe_read_frame(l_strBuffer, 23040);
+        // fseek( l_pOutFile, l_lSeekStartPoint, SEEK_SET);
+        fwrite(l_strBuffer, l_iReadSize, 1, l_pOutFile);
+        fwrite(l_strBuffer2, 1024, 1, l_pOutFile);
+        //l_lSeekStartPoint += FFMPEG_EXAMPLE_STEP;
+        l_lSeekStartPoint += 23040;
 
-      
+
     }
 
-    
-    
+
+
     /*for( i = l_iStart; i < l_iRead; i ++) {
         fwrite(l_strBuffer, 4608, 1, l_pOutFile);
     }
@@ -153,7 +153,7 @@ int main(int argc, char * argv[]) {
         }
     }
     */
- 
+
     fclose(l_pOutFile);
 
     if (m_pCodecCtx != NULL) {

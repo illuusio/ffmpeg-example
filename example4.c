@@ -41,6 +41,7 @@ long fe_read_seek(long filepos) {
 
     if( minus >= (2304 * 4) ) {
         minus -=  (2304 * 4);
+
     } else {
         minus = 0;
     }
@@ -137,19 +138,17 @@ unsigned int fe_read_frame(char *buffer, int size) {
                 if (ret <= 0) {
 #else
                 ret = avcodec_send_packet(m_pCodecCtx, &l_SPacket);
-                
-                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL))
-                {
+
+                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL)) {
                     printf("fe_read_frame: Frame getting error (%d)!\n", ret);
                     return 0;
                 }
 
                 ret = avcodec_receive_frame(m_pCodecCtx, l_pFrame);
 
-                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL))
-                {
+                if(ret == AVERROR(EAGAIN) || ret == AVERROR_EOF || ret == AVERROR(EINVAL)) {
 #endif
-                
+
                     // An error or EOF occured,index break out and return what
                     // we have so far.
                     printf("fe_read_frame: EOF or some othere decoding error (%d)!\n", ret);
@@ -158,6 +157,7 @@ unsigned int fe_read_frame(char *buffer, int size) {
 
 // If we have FFMpeg version which is less than 3.2 then we use older implementation
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
+
                 //frame->
                 if (l_iFrameFinished) {
 #endif
@@ -210,8 +210,8 @@ unsigned int fe_read_frame(char *buffer, int size) {
                            (long int) l_iReadedBytes,
                            (long int) l_iCopySize);
 
-		    l_iReadedBytes += (l_iReadBytes / 2);
-		    
+                    l_iReadedBytes += (l_iReadBytes / 2);
+
                     if( m_pOut != NULL ) {
 
                         if( (m_pOutSize - l_iOffset) < l_iCopySize ) {
@@ -232,7 +232,7 @@ unsigned int fe_read_frame(char *buffer, int size) {
                             memcpy(buffer, m_pOut, l_iCopySize);
                             l_iCopiedBytes += l_iCopySize;
                         }
-                        
+
                         l_iCopySize -= m_pOutSize - l_iOffset;
                         m_pOutSize = 0;
                         free(m_pOut);
@@ -266,11 +266,14 @@ unsigned int fe_read_frame(char *buffer, int size) {
                     if( l_iCopySize <= 0) {
                         m_bReadLoop = 1;
                     }
+
 // If we have FFMpeg version which is less than 3.2 then we use older implementation
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
+
                 } else {
                     printf("fe_read_frame: libavcodec 'avcodec_decode_audio4' didn't succeed or frame not finished (File could also just end!)\n");
                 }
+
 #endif
             }
 

@@ -165,7 +165,7 @@ int fe_resample_open(enum AVSampleFormat inSampleFmt,
            m_pFormatCtx->streams[m_iAudioStream]->codecpar->sample_rate,
            av_get_sample_fmt_name(inSampleFmt));
 #endif
-    
+
     printf(" to 44100 Sample format: %s\n",
            av_get_sample_fmt_name(outSampleFmt));
 

@@ -82,8 +82,9 @@ int fe_decode_open(char *filename) {
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
         if (m_pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
 #else
+
         if (m_pFormatCtx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-#endif            
+#endif
             m_iAudioStream = i;
             break;
         }
@@ -98,15 +99,17 @@ int fe_decode_open(char *filename) {
     // Find the decoder for the audio stream
     // If we have FFMpeg version which is less than 3.2 then we use older implementation
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
+
     if (!(m_pCodec = avcodec_find_decoder(m_pFormatCtx->streams[m_iAudioStream]->codec_id))) {
 #else
+
     if (!(m_pCodec = avcodec_find_decoder(m_pFormatCtx->streams[m_iAudioStream]->codecpar->codec_id))) {
 #endif
         printf("fe_decode_open: cannot find a decoder for %s\n",
                filename);
         return -1;
     }
-    
+
 // If we have FFMpeg version which is less than 3.2 then we use older implementation
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(57, 48, 0)
     // Get a pointer to the codec context for the video stream
