@@ -1,14 +1,14 @@
 FFmpeg-example
 ==============
 
-[FFmpeg](http://ffmpeg.org/) 0.11-3.2 or [Libav](http://libav.org/) 0.8-11 example application with byte exact reading 
+[FFmpeg](http://ffmpeg.org/) 0.11-3.4 or [Libav](http://libav.org/) 0.8-11 example application with byte exact reading 
 
 FFmpeg/Libav example program
 ============================
 
 This program is example how to use FFmpeg or Libav libarary with Byte exact reading (Audio only!). Tested with 'gcc'.
 Currently it only outputs 'out-for.pcm' and 'out-rev.pcm' files that are in Stereo 16-bit raw audio files (s16) that
-can be opened with Audacity audio editor or similar that imports raw audio.
+can be opened with Audacity audio editor or similar which imports raw PCM audio.
 
 Compling with CMake
 -------------------
