@@ -6,11 +6,11 @@ FFmpeg-example
 FFmpeg/Libav example program
 ============================
 
-This program is example how to use FFmpeg or Libav libarary with Byte exact reading (Audio only!). Tested with 'gcc'.
+This program is example how to use FFmpeg or Libav library with Byte exact reading (Audio only!). Tested with 'gcc'.
 Currently it only outputs 'out-for.pcm' and 'out-rev.pcm' files that are in Stereo 16-bit raw audio files (s16) that
 can be opened with Audacity audio editor or similar which imports raw PCM audio.
 
-Compling with CMake
+Compiling with CMake
 -------------------
 You need to have FFmpeg or Libav installed. You need [CMake](http://cmake.org/) and [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/).
 <pre>
@@ -23,7 +23,7 @@ make
 
 Compiling with autotools
 ------------------------
-You need to have FFmpeg or Libav installed. You need thave [GNU autotools](http://www.gnu.org/savannah-checkouts/gnu/automake/manual/html_node/Autotools-Introduction.html), [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) and [libtools](http://www.gnu.org/software/libtool/) 
+You need to have FFmpeg or Libav installed. You need have [GNU autotools](http://www.gnu.org/savannah-checkouts/gnu/automake/manual/html_node/Autotools-Introduction.html), [pkg-config](http://www.freedesktop.org/wiki/Software/pkg-config/) and [libtools](http://www.gnu.org/software/libtool/) 
 installed.
 <pre>
 ./autogen.sh
