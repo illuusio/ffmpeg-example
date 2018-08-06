@@ -129,8 +129,11 @@ int fe_decode_open(char *filename) {
         return -1;
     }
 
+// This is not needed anymore above FFMpeg version 4.0
+#if LIBAVCODEC_VERSION_INT < 3805796
     // Se timebase correct
     av_codec_set_pkt_timebase(m_pCodecCtx, m_pFormatCtx->streams[m_iAudioStream]->time_base);
+#endif
 
     // Make sure that Codecs are identical or  avcodec_open2 fails.
     m_pCodecCtx->codec_id = m_pCodec->id;

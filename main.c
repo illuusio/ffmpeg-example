@@ -72,8 +72,11 @@ int main(int argc, char * argv[]) {
         return 0;
     }
 
+// Below FFmpeg 4.0.1 we need to register all before use
+#if LIBAVCODEC_VERSION_INT < 3805796
     av_register_all();
     avcodec_register_all();
+#endif
 
     if(fe_decode_open(argv[1]) < 0) {
         printf("main: Can't open file exiting!\n");
