@@ -1,4 +1,4 @@
-INCLUDES = $(FFMPEG_CFLAGS) $(C_OPTIONS) -D_POSIX_SOURCE -D_USE_XOPEN -D_USE_MISC
+AM_CPPFLAGS = $(FFMPEG_CFLAGS) $(C_OPTIONS) -D_POSIX_SOURCE -D_USE_XOPEN -D_USE_MISC
 ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = COPYING compile-pkgconfig.sh compile.sh CMakeLists.txt CMakeModules/FindFFmpeg.cmake SConstruct autogen.sh m4/*

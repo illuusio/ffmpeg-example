@@ -108,7 +108,6 @@ unsigned int fe_read_frame(char *buffer, int size) {
 
     int m_bReadLoop = 0;
     int l_iReadBytes = 0;
-    int l_iFrameFinished = 0;
 
     double l_fCurrentFFMPEGPosSec = 0;
     double l_fCurrentFFMPEGPosByte = 0;
