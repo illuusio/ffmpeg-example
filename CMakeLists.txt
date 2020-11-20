@@ -1,13 +1,13 @@
 project(ffmpeg-examples)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
 #versioning
-set(CPACK_PACKAGE_VERSION_MAJOR 18)
-set(CPACK_PACKAGE_VERSION_MINOR 08)
-set(CPACK_PACKAGE_VERSION_PATCH 11)
+set(CPACK_PACKAGE_VERSION_MAJOR 20)
+set(CPACK_PACKAGE_VERSION_MINOR 11)
+set(CPACK_PACKAGE_VERSION_PATCH 19)
 set(FFMPEGEXAMPLE_PROTO_VER 0)
 set(FFMPEGEXAMPLE_VERSION
     "${CPACK_PACKAGE_VERSION_MAJOR}.
@@ -36,18 +36,19 @@ add_executable(ffmpeg-example-bin
   main.c)
 
 include_directories(".")
-find_package(FFmpeg REQUIRED)
+# find_package(FFmpeg REQUIRED)
+find_package(LIBAV REQUIRED)
 
-# FFMPEG_FOUND - system has ffmpeg or libav
-# FFMPEG_INCLUDE_DIR - the ffmpeg include directory
-# FFMPEG_LIBRARIES
-# FFMPEG_LIBAVCODEC
-# FFMPEG_LIBAVFORMAT
-# FFMPEG_LIBAVUTIL
-if(FFMPEG_FOUND)
+# LIBAV_FOUND - system has ffmpeg or libav
+# LIBAV_INCLUDE_DIR - the ffmpeg include directory
+# LIBAV_LIBRARIES
+# LIBAV_LIBAVCODEC
+# LIBAV_LIBAVFORMAT
+# LIBAV_LIBAVUTIL
+if(LIBAV_FOUND)
   message("Found FFMPEG/LibAV libraries")
-  include_directories(${FFMPEG_INCLUDE_DIR})
-  target_link_libraries(ffmpeg-example-bin ${FFMPEG_LIBRARIES})
+  include_directories(${LIBAV_INCLUDE_DIR})
+  target_link_libraries(ffmpeg-example-bin ${LIBAV_LIBRARIES})
 else()
   message("Can't find libavcodec, libavformat or libavutil. Add them!")
 endif()
