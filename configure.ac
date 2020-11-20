@@ -1,5 +1,5 @@
 AC_PREREQ([2.57])
-AC_INIT([ffmpeg-example], [180811], [https://github.com/illuusio], [ffmpeg-example], [https://github.com/illuusio])
+AC_INIT([ffmpeg-example], [201119], [https://github.com/illuusio/ffmpeg-example], [ffmpeg-example], [https://github.com/illuusio/ffmpeg-example])
 AM_INIT_AUTOMAKE([foreign dist-bzip2])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -19,9 +19,10 @@ PKG_CHECK_MODULES([FFMEG_LIBAVCODEC],[libavcodec],
 
 if test "${ac_libavcodec_version}" -ge "5818100"; then
     echo "FFMpeg Version is bigger than 4.0.1. Which to SWResample because AVResample is depricated."
-    RESAMPLER_LIB="swresample"
-    RESAMPLER="__LIBSWRESAMPLE__"
+    RESAMPLELIB="libswresample"
+    RESAMPLE="__LIBSWRESAMPLE__"
 fi
+
 
 AS_IF([test "x$enable_avresample" == "xno"], [
   dnl As we don't need education we disable this feature
