@@ -9,10 +9,8 @@ set(CPACK_PACKAGE_VERSION_MAJOR 20)
 set(CPACK_PACKAGE_VERSION_MINOR 11)
 set(CPACK_PACKAGE_VERSION_PATCH 19)
 set(FFMPEGEXAMPLE_PROTO_VER 0)
-set(FFMPEGEXAMPLE_VERSION
-    "${CPACK_PACKAGE_VERSION_MAJOR}.
-    ${CPACK_PACKAGE_VERSION_MINOR}.
-    ${CPACK_PACKAGE_VERSION_PATCH}")
+set(FFMPEGEXAMPLE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.\
+${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 
 set(target_dir "bin")
 
@@ -25,8 +23,6 @@ set(target_dir "bin")
 # set(CMAKE_CXX_FLAGS ${CMAKE_C_FLAGS})
 # set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
 # set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -D__LIBAVRESAMPLE__ -std=c99")
 
 add_executable(ffmpeg-example-bin
   example1.c
@@ -54,27 +50,36 @@ else()
 endif()
 
 target_link_libraries(ffmpeg-example-bin "-lm")
-target_link_libraries(ffmpeg-example-bin "-lavresample")
+
+option(LIBAV_AVRESAMPLE "Use AvResample not SWResample (depricated with 4.0.1) (off)" OFF)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -std=c99")
+
+if(LIBAV_AVRESAMPLE)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__LIBAVRESAMPLE__")
+    target_link_libraries(ffmpeg-example-bin "-lavresample")
+else()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__LIBSWRESAMPLE__")
+    target_link_libraries(ffmpeg-example-bin "-lswresample")    
+endif()
+
 
 
 # CPack variables
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "FFMPEG example CMake file")
 set(CPACK_PACKAGE_VENDOR "Tuukka Pasanen <tuukka.pasanen@ilmi.fi>")
-set(CPACK_PACKAGE_FILE_NAME "ffmpeg-example-${HEDGEWARS_VERSION}")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "ffmpeg-example-src-${HEDGEWARS_VERSION}")
+set(CPACK_PACKAGE_FILE_NAME "ffmpeg-example-${FFMPEGEXAMPLE_VERSION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "ffmpeg-example-src-${FFMPEGEXAMPLE_VERSION}")
 set(CPACK_SOURCE_GENERATOR "TBZ2")
 set(CPACK_PACKAGE_EXECUTABLES "ffmpeg-example-bin")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY
-  "ffmpeg-example
-  ${CPACK_PACKAGE_VERSION_MAJOR}.
-  ${CPACK_PACKAGE_VERSION_MINOR}.
-  ${CPACK_PACKAGE_VERSION_PATCH}")
+  "ffmpeg-example ${CPACK_PACKAGE_VERSION_MAJOR}.\
+   ${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 
 if(WIN32 AND NOT UNIX)
 set(CPACK_NSIS_DISPLAY_NAME "FFMPEG Example")
-set(CPACK_NSIS_HELP_LINK "https://github.com/illuusio")
-set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/illuusio")
+set(CPACK_NSIS_HELP_LINK "https://github.com/illuusio/ffmpeg-example")
+set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/illuusio/ffmpeg-example")
 set(CPACK_NSIS_CONTACT "tuukka.pasanen@ilmi.fi")
 set(CPACK_NSIS_MODIFY_PATH OFF)
 set(CPACK_GENERATOR "ZIP;NSIS")
